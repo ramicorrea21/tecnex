@@ -29,11 +29,11 @@ export default function AdminLoginPage() {
     e.preventDefault()
     setError(null)
     setLoading(true)
-
+  
     try {
       await signIn(email, password)
-      router.push('/admin') // Redirigir al dashboard después del login
-    } catch (err) {
+      router.push('/admin/dashboard')
+    } catch (error) {  // Cambiamos err por error
       setError('Credenciales inválidas')
     } finally {
       setLoading(false)
