@@ -33,7 +33,7 @@ export default function AdminLoginPage() {
     try {
       await signIn(email, password)
       router.push('/admin/dashboard')
-    } catch (error) {  // Cambiamos err por error
+    } catch (err) {  // Cambiamos err por error
       setError('Credenciales inválidas')
     } finally {
       setLoading(false)
