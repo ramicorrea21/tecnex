@@ -9,6 +9,7 @@ import {
   Sheet,
   SheetContent,
 } from '@/components/ui/sheet'
+import { Separator } from '@/components/ui/separator'
 
 const navigationItems = [
   { 
@@ -36,12 +37,13 @@ function NavItems({ onCloseMobile }: NavItemsProps) {
   const pathname = usePathname()
   
   return (
-    <div className="space-y-4 py-4">
-      <div className="px-3 py-2">
-        <h2 className="mb-2 px-4 text-lg font-semibold">
-          Admin Panel
-        </h2>
-        <div className="space-y-1">
+    <div className="flex flex-col h-full">
+      <div className="h-16 flex items-center px-6">
+        <h2 className="text-lg font-semibold">Admin Panel</h2>
+      </div>
+      <Separator />
+      <div className="flex-1 px-3 py-4">
+        <nav className="space-y-1">
           {navigationItems.map((item) => (
             <Link
               key={item.href}
@@ -54,14 +56,17 @@ function NavItems({ onCloseMobile }: NavItemsProps) {
             >
               <Button
                 variant={pathname === item.href ? "secondary" : "ghost"}
-                className="w-full justify-start"
+                className={cn(
+                  "w-full justify-start hover:bg-gray-100",
+                  pathname === item.href && "bg-gray-100 hover:bg-gray-200"
+                )}
               >
                 <item.icon className="mr-2 h-4 w-4" />
                 {item.name}
               </Button>
             </Link>
           ))}
-        </div>
+        </nav>
       </div>
     </div>
   )
@@ -77,13 +82,16 @@ export function Sidebar({ className, showMobile, onCloseMobile }: SidebarProps) 
   return (
     <>
       {/* Desktop sidebar */}
-      <nav className={cn("flex flex-col h-screen", className)}>
+      <nav className={cn("border-r bg-white", className)}>
         <NavItems onCloseMobile={onCloseMobile} />
       </nav>
 
       {/* Mobile sidebar */}
       <Sheet open={showMobile} onOpenChange={onCloseMobile}>
-        <SheetContent side="left" className="w-64 p-0">
+        <SheetContent 
+          side="left" 
+          className="w-[280px] p-0"
+        >
           <NavItems onCloseMobile={onCloseMobile} />
         </SheetContent>
       </Sheet>
