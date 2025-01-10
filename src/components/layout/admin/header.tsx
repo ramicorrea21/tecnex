@@ -23,35 +23,37 @@ export function Header({ onMenuClick }: HeaderProps) {
     : '??'
 
   return (
-    <header className="border-b h-14 px-4 sm:px-6 flex items-center justify-between">
+    <header className="border-b bg-white h-16 px-4 sm:px-6 flex items-center justify-between sticky top-0 z-30">
       <Button 
         variant="ghost" 
         size="icon"
-        className="md:hidden"
+        className="md:hidden hover:bg-gray-100"
         onClick={onMenuClick}
       >
-        <Menu className="h-6 w-6" />
+        <Menu className="h-5 w-5" />
       </Button>
 
-      <div className="flex items-center space-x-4">
+      <div className="flex items-center gap-2">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button 
               variant="ghost" 
-              className="rounded-full h-8 w-8 p-0"
+              className="rounded-full h-8 w-8 p-0 hover:bg-gray-100"
             >
-              <Avatar>
-                <AvatarFallback>{initials}</AvatarFallback>
+              <Avatar className="h-8 w-8">
+                <AvatarFallback className="bg-primary/10 text-sm">
+                  {initials}
+                </AvatarFallback>
               </Avatar>
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem className="text-sm">
+          <DropdownMenuContent align="end" className="w-56">
+            <DropdownMenuItem disabled className="text-sm opacity-60">
               {user?.email}
             </DropdownMenuItem>
             <DropdownMenuItem 
               onClick={() => signOut()}
-              className="text-red-600"
+              className="text-red-600 focus:text-red-600 focus:bg-red-50"
             >
               Cerrar sesión
             </DropdownMenuItem>
