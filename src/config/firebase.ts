@@ -20,9 +20,28 @@ const storage = getStorage(app);
 
 // Connect to emulators in development
 if (process.env.NODE_ENV === 'development') {
-  connectAuthEmulator(auth, 'http://localhost:9099', { disableWarnings: true });
-  connectFirestoreEmulator(db, 'localhost', 8080);
-  connectStorageEmulator(storage, 'localhost', 9199);
+  try {
+    console.log('Iniciando conexión con emuladores...');
+    
+    const authHost = process.env.NEXT_PUBLIC_FIREBASE_AUTH_EMULATOR_HOST || 'localhost:9099';
+    console.log('Auth Host:', authHost);
+    
+    connectAuthEmulator(auth, `http://${authHost}`, { disableWarnings: true });
+    console.log('Auth emulator conectado');
+    
+    const firestoreHost = 'localhost';
+    const firestorePort = 8080;
+    connectFirestoreEmulator(db, firestoreHost, firestorePort);
+    console.log('Firestore emulator conectado');
+    
+    const storageHost = 'localhost';
+    const storagePort = 9199;
+    connectStorageEmulator(storage, storageHost, storagePort);
+    console.log('Storage emulator conectado');
+    
+  } catch (error) {
+    console.error('Error conectando a emuladores:', error);
+  }
 }
 
 export { app, auth, db, storage };

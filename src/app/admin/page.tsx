@@ -1,16 +1,14 @@
 'use client'
 
-import { useAuth } from '@/contexts/auth-context'
-import { Button } from '@/components/ui/button'
+import { useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 
-export default function AdminDashboard() {
-  const { user, signOut } = useAuth()
+export default function AdminPage() {
+  const router = useRouter()
 
-  return (
-    <div className="p-8">
-      <h1 className="text-2xl font-bold mb-4">Panel de Administración</h1>
-      <p className="mb-4">Bienvenido, {user?.email}</p>
-      <Button onClick={signOut}>Cerrar sesión</Button>
-    </div>
-  )
+  useEffect(() => {
+    router.push('/admin/dashboard')
+  }, [router])
+
+  return null
 }

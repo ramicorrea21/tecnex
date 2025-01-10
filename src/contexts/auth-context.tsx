@@ -1,7 +1,7 @@
 'use client'
 
 import { createContext, useContext, useEffect, useState } from 'react'
-import { User, AuthContextType } from '@/types/auth'
+import type { User, AuthContextType } from '@/types/auth'
 import { auth } from '@/config/firebase'
 import { 
   signInWithEmailAndPassword,
@@ -9,7 +9,7 @@ import {
   onAuthStateChanged
 } from 'firebase/auth'
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined)
+const AuthContext = createContext<AuthContextType | null>(null)
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
@@ -18,8 +18,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
-        // Aquí podríamos verificar en Firestore si el usuario es admin
-        // Por ahora asumimos que todos los usuarios autenticados son admin
         setUser({
           uid: firebaseUser.uid,
           email: firebaseUser.email,
@@ -36,12 +34,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signIn = async (email: string, password: string) => {
     try {
-      await signInWithEmailAndPassword(auth, email, password)
-    } catch (error) {
-      console.error('Error signing in:', error)
-      throw error
+      console.log('Intentando login con:', email);
+      console.log('Estado actual de auth:', auth);
+      console.log('Configuración de emulador:', (auth as any)._config);
+      
+      const result = await signInWithEmailAndPassword(auth, email, password);
+      console.log('Login exitoso:', result.user);
+    } catch (error: any) {
+      console.error('Error detallado:', {
+        code: error.code,
+        message: error.message,
+        fullError: error
+      });
+      throw error;
     }
-  }
+  };
 
   const signOut = async () => {
     try {
@@ -53,23 +60,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
-  const value = {
-    user,
-    loading,
-    signIn,
-    signOut
-  }
-
   return (
-    <AuthContext.Provider value={value}>
-      {!loading && children}
+    <AuthContext.Provider 
+      value={{
+        user,
+        loading,
+        signIn,
+        signOut
+      }}
+    >
+      {children}
     </AuthContext.Provider>
   )
 }
 
 export const useAuth = () => {
   const context = useContext(AuthContext)
-  if (context === undefined) {
+  if (!context) {
     throw new Error('useAuth must be used within an AuthProvider')
   }
   return context

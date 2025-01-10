@@ -1,0 +1,24 @@
+[debug] [2025-01-10T12:29:35.056Z] ----------------------------------------------------------------------
+[debug] [2025-01-10T12:29:35.060Z] Command:       /usr/local/bin/node /usr/local/bin/firebase emulators:start --project tecnexecommerce
+[debug] [2025-01-10T12:29:35.061Z] CLI Version:   13.29.1
+[debug] [2025-01-10T12:29:35.061Z] Platform:      linux
+[debug] [2025-01-10T12:29:35.061Z] Node Version:  v18.20.5
+[debug] [2025-01-10T12:29:35.062Z] Time:          Fri Jan 10 2025 12:29:35 GMT+0000 (Coordinated Universal Time)
+[debug] [2025-01-10T12:29:35.062Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2025-01-10T12:29:35.066Z] >>> [apiv2][query] GET https://firebase-public.firebaseio.com/cli.json [none]
+[debug] [2025-01-10T12:29:35.221Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] Failed to authenticate, have you run firebase login?
+[warn] ⚠  emulators: You are not currently authenticated so some features may not work correctly. Please run firebase login to authenticate the CLI. 
+[debug] [2025-01-10T12:29:35.361Z] openjdk version "11.0.25" 2024-10-15
+OpenJDK Runtime Environment (build 11.0.25+9-alpine-r0)
+
+[debug] [2025-01-10T12:29:35.362Z] OpenJDK 64-Bit Server VM (build 11.0.25+9-alpine-r0, mixed mode)
+
+[debug] [2025-01-10T12:29:35.368Z] Parsed Java major version: 11
+[info] i  emulators: Starting emulators: auth, firestore, storage {"metadata":{"emulator":{"name":"hub"},"message":"Starting emulators: auth, firestore, storage"}}
+[debug] [2025-01-10T12:29:35.378Z] [logging] Logging Emulator only supports listening on one address (127.0.0.1). Not listening on ::1
+[debug] [2025-01-10T12:29:35.378Z] assigned listening specs for emulators {"user":{"hub":[{"address":"0.0.0.0","family":"IPv4","port":4400}],"ui":[{"address":"0.0.0.0","family":"IPv4","port":4000}],"auth":[{"address":"0.0.0.0","family":"IPv4","port":9099}],"firestore":[{"address":"0.0.0.0","family":"IPv4","port":8080}],"firestore.websocket":[{"address":"0.0.0.0","family":"IPv4","port":9150}],"storage":[{"address":"0.0.0.0","family":"IPv4","port":9199}],"logging":[{"address":"127.0.0.1","family":"IPv4","port":4500}]},"metadata":{"message":"assigned listening specs for emulators"}}
+[debug] [2025-01-10T12:29:35.384Z] [hub] writing locator at /tmp/hub-tecnexecommerce.json
+[info] i  firestore: downloading cloud-firestore-emulator-v1.19.8.jar... {"metadata":{"emulator":{"name":"firestore"},"message":"downloading cloud-firestore-emulator-v1.19.8.jar..."}}
+[debug] [2025-01-10T12:29:35.413Z] >>> [apiv2][query] GET https://storage.googleapis.com/firebase-preview-drop/emulator/cloud-firestore-emulator-v1.19.8.jar 

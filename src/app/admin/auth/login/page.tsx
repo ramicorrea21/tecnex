@@ -19,6 +19,8 @@ export default function AdminLoginPage() {
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  console.log('Rendering login page')
+
   
   const router = useRouter()
   const { signIn } = useAuth()

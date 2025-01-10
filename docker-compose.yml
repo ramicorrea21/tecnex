@@ -14,6 +14,8 @@ services:
       - NODE_ENV=development
     depends_on:
       - firebase
+    networks:
+      - app-network
 
   firebase:
     build:
@@ -29,3 +31,9 @@ services:
       - "9150:9150"  # Reserved
     volumes:
       - .:/app
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
