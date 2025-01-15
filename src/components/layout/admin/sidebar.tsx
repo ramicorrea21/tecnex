@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, Package, ListTree } from 'lucide-react'
+import { LayoutDashboard, Package, ListTree, Truck } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import {
@@ -26,6 +26,11 @@ const navigationItems = [
     name: 'Categorías', 
     href: '/admin/dashboard/categories', 
     icon: ListTree 
+  },
+  {
+    name: 'Ordenes',
+    href: '/admin/dashboard/orders',
+    icon: Truck
   }
 ]
 

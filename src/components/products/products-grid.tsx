@@ -1,5 +1,3 @@
-'use client'
-
 import Image from 'next/image'
 import { Edit, Trash2 } from 'lucide-react'
 import { Card } from '@/components/ui/card'
@@ -17,12 +15,12 @@ interface ProductsGridProps {
 
 function ProductImage({ src }: { src: string }) {
   return (
-    <div className="relative aspect-square">
+    <div className="relative aspect-square w-full">
       <Image
         src={src}
         alt="Product image"
         fill
-        className="object-cover rounded-md"
+        className="rounded-t-lg object-cover"
         onError={(e) => {
           const target = e.target as HTMLImageElement;
           target.src = PLACEHOLDER_IMAGE;
@@ -35,34 +33,38 @@ function ProductImage({ src }: { src: string }) {
 
 export function ProductsGrid({ products, onEdit, onDelete }: ProductsGridProps) {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
       {products.map((product) => (
-        <Card key={product.id} className="overflow-hidden">
+        <Card key={product.id} className="flex flex-col overflow-hidden">
           <ProductImage src={product.images[0] || PLACEHOLDER_IMAGE} />
-          <div className="p-4">
-            <div className="flex items-start justify-between">
-              <div>
-                <h3 className="font-semibold">{product.name}</h3>
-                <div className="flex items-baseline gap-2">
-                  <span className="text-lg font-bold">
-                    ${product.price.toFixed(2)}
-                  </span>
-                  {product.comparePrice && (
-                    <span className="text-sm text-muted-foreground line-through">
-                      ${product.comparePrice.toFixed(2)}
-                    </span>
-                  )}
-                </div>
-              </div>
-              <Badge variant={product.active ? "default" : "secondary"}>
+          <div className="flex flex-1 flex-col p-4">
+            <div className="mb-2 flex items-start justify-between gap-2">
+              <h3 className="font-semibold line-clamp-2">{product.name}</h3>
+              <Badge 
+                variant={product.active ? "default" : "secondary"}
+                className="whitespace-nowrap"
+              >
                 {product.active ? 'Activo' : 'Inactivo'}
               </Badge>
             </div>
 
-            <div className="mt-2 flex items-center gap-2 text-sm text-muted-foreground">
+            <div className="flex items-baseline gap-2">
+              <span className="text-lg font-bold">
+                ${product.price.toFixed(2)}
+              </span>
+              {product.comparePrice && (
+                <span className="text-sm text-muted-foreground line-through">
+                  ${product.comparePrice.toFixed(2)}
+                </span>
+              )}
+            </div>
+
+            <div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
               <span>Stock: {product.stock}</span>
               {product.featured && (
-                <Badge variant="secondary">Destacado</Badge>
+                <Badge variant="secondary" className="whitespace-nowrap">
+                  Destacado
+                </Badge>
               )}
             </div>
 
