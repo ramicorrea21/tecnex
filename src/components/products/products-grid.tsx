@@ -16,14 +16,10 @@ interface ProductsGridProps {
 }
 
 function ProductImage({ src }: { src: string }) {
-  const imageUrl = src.startsWith('http://localhost:9199') 
-    ? src.replace('http://localhost:9199', 'http://localhost:9199')
-    : src
-
   return (
     <div className="relative aspect-square">
       <Image
-        src={imageUrl || PLACEHOLDER_IMAGE}
+        src={src}
         alt="Product image"
         fill
         className="object-cover rounded-md"
@@ -31,6 +27,7 @@ function ProductImage({ src }: { src: string }) {
           const target = e.target as HTMLImageElement;
           target.src = PLACEHOLDER_IMAGE;
         }}
+        unoptimized
       />
     </div>
   )

@@ -25,11 +25,8 @@ export function ProductImagesUpload({
     e.stopPropagation()
     if (e.target.files) {
       const files = Array.from(e.target.files)
-      setNewImages(prev => {
-        const updated = [...prev, ...files]
-        onImagesChange(updated, keepExisting)
-        return updated
-      })
+      setNewImages(prev => [...prev, ...files])
+      onImagesChange([...newImages, ...files], keepExisting)
     }
   }
 
@@ -38,13 +35,10 @@ export function ProductImagesUpload({
     e.stopPropagation()
     if (e.dataTransfer.files) {
       const files = Array.from(e.dataTransfer.files)
-      setNewImages(prev => {
-        const updated = [...prev, ...files]
-        onImagesChange(updated, keepExisting)
-        return updated
-      })
+      setNewImages(prev => [...prev, ...files])
+      onImagesChange([...newImages, ...files], keepExisting)
     }
-  }, [onImagesChange, keepExisting])
+  }, [onImagesChange, keepExisting, newImages])
 
   const removeNewImage = (index: number) => {
     setNewImages(prev => {
