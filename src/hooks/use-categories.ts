@@ -1,4 +1,6 @@
-import { useState, useCallback } from 'react'
+'use client'
+
+import { useState, useCallback, useEffect } from 'react'
 import { 
   getCategories, 
   createCategory, 
@@ -9,7 +11,7 @@ import type { Category, CategoryFormData } from '@/types/category'
 
 export function useCategories() {
   const [categories, setCategories] = useState<Category[]>([])
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true) // Inicialmente true
   const [error, setError] = useState<string | null>(null)
 
   const fetchCategories = useCallback(async () => {
@@ -17,6 +19,7 @@ export function useCategories() {
       setLoading(true)
       setError(null)
       const data = await getCategories()
+      console.log('Fetched categories:', data) // Debug log
       setCategories(data)
     } catch (err) {
       setError('Error al cargar las categorías')
@@ -25,6 +28,11 @@ export function useCategories() {
       setLoading(false)
     }
   }, [])
+
+  // Cargar categorías automáticamente al montar
+  useEffect(() => {
+    fetchCategories()
+  }, [fetchCategories])
 
   const create = useCallback(async (data: CategoryFormData) => {
     try {

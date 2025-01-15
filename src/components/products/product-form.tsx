@@ -44,6 +44,7 @@ export function ProductForm({
     comparePrice: product?.comparePrice,
     stock: product?.stock || 0,
     categoryId: product?.categoryId || '',
+    brand: product?.brand || '',  // Added brand field
     active: product?.active ?? true,
     featured: product?.featured ?? false,
     existingImages: product?.images || [],
@@ -54,7 +55,6 @@ export function ProductForm({
     fetchCategories()
   }, [fetchCategories])
 
-
   useEffect(() => {
     if (product) {
       setFormData({
@@ -64,6 +64,7 @@ export function ProductForm({
         comparePrice: product.comparePrice,
         stock: product.stock,
         categoryId: product.categoryId,
+        brand: product.brand,  // Added brand field
         active: product.active,
         featured: product.featured,
         existingImages: product.images || [],
@@ -76,7 +77,6 @@ export function ProductForm({
     e.preventDefault()
     try {
       setLoading(true)
-      console.log('Submitting form data:', formData)
       await onSubmit(formData)
     } catch (error) {
       console.error('Error submitting form:', error)
@@ -103,6 +103,19 @@ export function ProductForm({
                 onChange={(e) => setFormData(prev => ({
                   ...prev,
                   name: e.target.value
+                }))}
+                required
+                disabled={loading}
+              />
+            </div>
+
+            <div className="col-span-2">
+              <label className="text-sm font-medium">Marca</label>
+              <Input
+                value={formData.brand}
+                onChange={(e) => setFormData(prev => ({
+                  ...prev,
+                  brand: e.target.value
                 }))}
                 required
                 disabled={loading}

@@ -1,5 +1,3 @@
-import type { Category } from './category'
-
 export interface Product {
   id: string
   name: string
@@ -9,7 +7,8 @@ export interface Product {
   comparePrice?: number   
   stock: number
   images: string[]         
-  categoryId: string       
+  categoryId: string
+  brand: string           // Added brand field
   active: boolean
   featured: boolean      
   createdAt: Date
@@ -23,6 +22,7 @@ export interface ProductFormData {
   comparePrice?: number
   stock: number
   categoryId: string
+  brand: string           // Added brand field
   active: boolean
   featured: boolean
   images?: File[]          
@@ -31,6 +31,7 @@ export interface ProductFormData {
 
 export interface ProductFilters {
   category?: string
+  brand?: string          // Added brand filter
   search?: string
   minPrice?: number
   maxPrice?: number

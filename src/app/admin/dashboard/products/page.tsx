@@ -7,11 +7,11 @@ import { Plus } from 'lucide-react'
 import { ProductsFilters } from '@/components/products/products-filters'
 import { ProductsGrid } from '@/components/products/products-grid'
 import { ProductForm } from '@/components/products/product-form'
-import { DeleteCategoryAlert } from '@/components/categories/delete-category-alert' // Reutilizamos este componente
+import { DeleteCategoryAlert } from '@/components/categories/delete-category-alert'
 import type { Product, ProductFormData } from '@/types/product'
 
 export default function ProductsPage() {
-  const { products, loading, error, create, update, remove, updateFilters } = useProducts()
+  const { products, allProducts, loading, error, create, update, remove, updateFilters } = useProducts()
   const [formOpen, setFormOpen] = useState(false)
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [selectedProduct, setSelectedProduct] = useState<Product | undefined>()
@@ -64,7 +64,10 @@ export default function ProductsPage() {
         </Button>
       </div>
 
-      <ProductsFilters onFiltersChange={updateFilters} />
+      <ProductsFilters 
+        onFiltersChange={updateFilters} 
+        products={allProducts} // Pasamos todos los productos para el filtro de marcas
+      />
 
       {products.length === 0 ? (
         <div className="text-center py-12 text-muted-foreground">

@@ -36,6 +36,7 @@ function convertProduct(doc: QueryDocumentSnapshot): Product {
     stock: data.stock,
     images: data.images || [],
     categoryId: data.categoryId,
+    brand: data.brand || '', // Agregado el campo brand
     active: data.active,
     featured: data.featured,
     createdAt: data.createdAt?.toDate(),
@@ -80,6 +81,10 @@ export async function getProducts(filters?: ProductFilters): Promise<Product[]> 
       q = query(q, where('categoryId', '==', filters.category))
     }
     
+    if (filters?.brand) { // Agregado filtro por marca
+      q = query(q, where('brand', '==', filters.brand))
+    }
+    
     if (filters?.inStock) {
       q = query(q, where('stock', '>', 0))
     }
@@ -97,6 +102,7 @@ export async function getProducts(filters?: ProductFilters): Promise<Product[]> 
     throw error
   }
 }
+
 
 // Obtener un producto por ID
 export async function getProduct(id: string): Promise<Product | null> {
@@ -126,6 +132,7 @@ export async function createProduct(data: ProductFormData): Promise<string> {
       comparePrice: data.comparePrice ? Number(data.comparePrice) : null,
       stock: Number(data.stock),
       categoryId: data.categoryId,
+      brand: data.brand, // Agregado el campo brand
       active: data.active,
       featured: data.featured,
       images: [], // Las URLs se añadirán después
@@ -152,7 +159,6 @@ export async function createProduct(data: ProductFormData): Promise<string> {
     throw error
   }
 }
-
 // Actualizar producto
 export async function updateProduct(id: string, data: ProductFormData): Promise<void> {
   try {
@@ -178,6 +184,7 @@ export async function updateProduct(id: string, data: ProductFormData): Promise<
       comparePrice: data.comparePrice ? Number(data.comparePrice) : null,
       stock: Number(data.stock),
       categoryId: data.categoryId,
+      brand: data.brand, // Agregado el campo brand
       active: data.active,
       featured: data.featured,
       images: imageUrls,
