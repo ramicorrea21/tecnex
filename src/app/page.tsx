@@ -7,7 +7,9 @@ export default function Home() {
       <MainNav />
       <CategoryNav />
       <main className="flex-1">
-        {/* Contenido principal irá aquí */}
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          {/* Contenido principal irá aquí */}
+        </div>
       </main>
     </div>
   )

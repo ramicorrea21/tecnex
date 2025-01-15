@@ -6,7 +6,7 @@ import Link from "next/link"
 export function MainNav() {
   return (
     <nav className="w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container mx-auto">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex h-20 items-center justify-between gap-4 md:gap-8">
           {/* Logo */}
           <div className="flex shrink-0 items-center">
@@ -16,7 +16,7 @@ export function MainNav() {
           </div>
 
           {/* Search - hidden on mobile, shown on tablet and up */}
-          <div className="hidden md:flex flex-1 items-center justify-center">
+          <div className="hidden md:flex flex-1 items-center justify-center px-8">
             <SearchBar />
           </div>
 
@@ -36,7 +36,7 @@ export function MainNav() {
         </div>
 
         {/* Mobile Search - shown below nav on mobile only */}
-        <div className="md:hidden py-2 px-4">
+        <div className="md:hidden py-4">
           <SearchBar />
         </div>
       </div>

@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
-  title: "Tecnex Admin",
-  description: "Panel de administración de Tecnex",
+  title: "Tecnex",
+  description: "ecommerce",
 }
 
 export default function RootLayout({

@@ -40,9 +40,9 @@ export function ProductForm({
   const [formData, setFormData] = useState<ProductFormData>({
     name: product?.name || '',
     description: product?.description || '',
-    price: product?.price || 0,
+    price: product?.price,
     comparePrice: product?.comparePrice,
-    stock: product?.stock || 0,
+    stock: product?.stock,
     categoryId: product?.categoryId || '',
     active: product?.active ?? true,
     featured: product?.featured ?? false,
@@ -53,7 +53,6 @@ export function ProductForm({
   useEffect(() => {
     fetchCategories()
   }, [fetchCategories])
-
 
   useEffect(() => {
     if (product) {
@@ -128,10 +127,10 @@ export function ProductForm({
                 type="number"
                 step="0.01"
                 min="0"
-                value={formData.price}
+                value={formData.price || ''}
                 onChange={(e) => setFormData(prev => ({
                   ...prev,
-                  price: e.target.value === '' ? 0 : parseFloat(e.target.value)
+                  price: e.target.value ? parseFloat(e.target.value) : undefined
                 }))}
                 required
                 disabled={loading}
@@ -158,10 +157,10 @@ export function ProductForm({
               <Input
                 type="number"
                 min="0"
-                value={formData.stock}
+                value={formData.stock || ''}
                 onChange={(e) => setFormData(prev => ({
                   ...prev,
-                  stock: e.target.value === '' ? 0 : parseInt(e.target.value)
+                  stock: e.target.value ? parseInt(e.target.value) : undefined
                 }))}
                 required
                 disabled={loading}

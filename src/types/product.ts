@@ -19,9 +19,9 @@ export interface Product {
 export interface ProductFormData {
   name: string
   description: string
-  price: number
+  price: number | undefined
   comparePrice?: number
-  stock: number
+  stock: number | undefined
   categoryId: string
   active: boolean
   featured: boolean
