@@ -1,8 +1,25 @@
 rules_version = '2';
 service firebase.storage {
   match /b/{bucket}/o {
+    // Reuse the same admin check logic from your Firestore rules
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isAdmin() {
+      return isAuthenticated() && 
+        firestore.get(/databases/(default)/documents/admins/$(request.auth.uid)).data != null;
+    }
+
+    // Products folder rules
+    match /products/{productId}/{fileName} {
+      allow read: if true;  // Anyone can read product images
+      allow write: if isAdmin();  // Only admins can upload/modify images
+    }
+
+    // Default deny
     match /{allPaths=**} {
-      allow read, write: if true;
+      allow read, write: if false;
     }
   }
 }
