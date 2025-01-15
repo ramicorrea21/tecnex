@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button"
 import { ShoppingCart } from "lucide-react"
 import { SearchBar } from "./SearchBar"
+import Link from "next/link"
 
 export function MainNav() {
   return (
@@ -9,9 +10,9 @@ export function MainNav() {
         <div className="flex h-20 items-center justify-between gap-4 md:gap-8">
           {/* Logo */}
           <div className="flex shrink-0 items-center">
-            <a href="/" className="text-2xl md:text-3xl font-bold text-primary">
+            <Link href="/" className="text-2xl md:text-3xl font-bold text-primary">
               TECNEX
-            </a>
+            </Link>
           </div>
 
           {/* Search - hidden on mobile, shown on tablet and up */}
