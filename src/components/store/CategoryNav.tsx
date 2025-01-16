@@ -2,13 +2,14 @@
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import { useCategories } from "@/hooks/use-categories" 
+import { useCategories } from "@/hooks/use-categories"
 import { Skeleton } from "@/components/ui/skeleton"
+import Link from "next/link"
+import { use } from 'react'
 
 export function CategoryNav() {
   const { categories, loading, error } = useCategories()
 
-  // Loading state
   if (loading) {
     return (
       <div className="relative border-b bg-muted">
@@ -30,7 +31,6 @@ export function CategoryNav() {
     )
   }
 
-  // Error state
   if (error) {
     return (
       <div className="relative border-b bg-muted">
@@ -54,12 +54,17 @@ export function CategoryNav() {
             <ul className="flex items-center gap-6 flex-nowrap">
               {categories.map((category) => (
                 <li key={category.id} className="flex-none">
-                  <Button
-                    variant="ghost"
-                    className="text-sm font-medium transition-colors hover:text-primary whitespace-nowrap"
+                  <Link 
+                    href={`/${encodeURIComponent(category.name.toLowerCase())}`}
+                    className="inline-block"
                   >
-                    {category.name}
-                  </Button>
+                    <Button
+                      variant="ghost"
+                      className="text-sm font-medium transition-colors hover:text-primary whitespace-nowrap"
+                    >
+                      {category.name}
+                    </Button>
+                  </Link>
                 </li>
               ))}
             </ul>
