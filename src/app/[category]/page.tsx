@@ -15,8 +15,15 @@ function ProductGrid({ categorySlug }: { categorySlug: string }) {
   const { products, loading: productsLoading, error: productsError } = useProducts()
   const { categories, loading: categoriesLoading, error: categoriesError } = useCategories()
 
-  // Encontrar el ID de la categoría basado en el slug
-  const category = categories.find(cat => cat.slug === categorySlug)
+  // Normalizar el slug removiendo espacios al final y agregando el guión si no lo tiene
+  const normalizedSlug = categorySlug.trim() + (categorySlug.endsWith('-') ? '' : '-')
+  
+  // Debug
+  console.log('Normalized slug:', normalizedSlug)
+  console.log('Available slugs:', categories.map(c => c.slug))
+
+  // Encontrar el ID de la categoría basado en el slug normalizado
+  const category = categories.find(cat => cat.slug === normalizedSlug)
   const categoryId = category?.id
 
   // Filtramos los productos que coincidan con la categoría actual
@@ -45,7 +52,9 @@ function ProductGrid({ categorySlug }: { categorySlug: string }) {
   if (!category) {
     return (
       <div className="text-center py-10">
-        <p className="text-muted-foreground">Categoría no encontrada</p>
+        <p className="text-muted-foreground">
+          Categoría no encontrada: {normalizedSlug}
+        </p>
       </div>
     )
   }
@@ -110,6 +119,7 @@ export default function CategoryPage({
   params: Promise<{ category: string }>
 }) {
   const { category } = use(params)
+  const decodedCategory = decodeURIComponent(category).trim()
   
   return (
     <div className="flex min-h-screen flex-col">
@@ -119,9 +129,9 @@ export default function CategoryPage({
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <ScrollArea className="h-full">
             <h1 className="text-2xl font-bold mb-6">
-              {decodeURIComponent(category)}
+              {decodedCategory}
             </h1>
-            <ProductGrid categorySlug={decodeURIComponent(category)} />
+            <ProductGrid categorySlug={decodedCategory} />
           </ScrollArea>
         </div>
       </main>
