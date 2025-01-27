@@ -15,18 +15,18 @@ function ProductGrid({ categorySlug }: { categorySlug: string }) {
   const { products, loading: productsLoading, error: productsError } = useProducts()
   const { categories, loading: categoriesLoading, error: categoriesError } = useCategories()
 
-  // Normalizar el slug removiendo espacios al final y agregando el guión si no lo tiene
-  const normalizedSlug = categorySlug.trim() + (categorySlug.endsWith('-') ? '' : '-')
+  const normalizedSlug = categorySlug
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, '-') + (categorySlug.endsWith('-') ? '' : '-')
   
   // Debug
   console.log('Normalized slug:', normalizedSlug)
   console.log('Available slugs:', categories.map(c => c.slug))
 
-  // Encontrar el ID de la categoría basado en el slug normalizado
   const category = categories.find(cat => cat.slug === normalizedSlug)
   const categoryId = category?.id
 
-  // Filtramos los productos que coincidan con la categoría actual
   const categoryProducts = products.filter(product => product.categoryId === categoryId)
 
   if (productsError || categoriesError) {
