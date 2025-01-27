@@ -2,6 +2,7 @@
 
 import { use } from "react"
 import { useProducts } from "@/hooks/use-products"
+import { useCategories } from "@/hooks/use-categories"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -10,14 +11,22 @@ import { Button } from "@/components/ui/button"
 import { MainNav } from "@/components/store/MainNav"
 import { CategoryNav } from "@/components/store/CategoryNav"
 
-function ProductGrid() {
-  const { products, loading, error } = useProducts()
+function ProductGrid({ categorySlug }: { categorySlug: string }) {
+  const { products, loading: productsLoading, error: productsError } = useProducts()
+  const { categories, loading: categoriesLoading, error: categoriesError } = useCategories()
 
-  if (error) {
-    return <div className="text-red-500">{error}</div>
+  // Encontrar el ID de la categoría basado en el slug
+  const category = categories.find(cat => cat.slug === categorySlug)
+  const categoryId = category?.id
+
+  // Filtramos los productos que coincidan con la categoría actual
+  const categoryProducts = products.filter(product => product.categoryId === categoryId)
+
+  if (productsError || categoriesError) {
+    return <div className="text-red-500">{productsError || categoriesError}</div>
   }
 
-  if (loading) {
+  if (productsLoading || categoriesLoading) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {[...Array(8)].map((_, i) => (
@@ -33,9 +42,25 @@ function ProductGrid() {
     )
   }
 
+  if (!category) {
+    return (
+      <div className="text-center py-10">
+        <p className="text-muted-foreground">Categoría no encontrada</p>
+      </div>
+    )
+  }
+
+  if (categoryProducts.length === 0) {
+    return (
+      <div className="text-center py-10">
+        <p className="text-muted-foreground">No hay productos en esta categoría</p>
+      </div>
+    )
+  }
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-      {products.map((product) => (
+      {categoryProducts.map((product) => (
         <Card key={product.id} className="overflow-hidden">
           <div className="relative h-48">
             <img
@@ -96,7 +121,7 @@ export default function CategoryPage({
             <h1 className="text-2xl font-bold mb-6">
               {decodeURIComponent(category)}
             </h1>
-            <ProductGrid />
+            <ProductGrid categorySlug={decodeURIComponent(category)} />
           </ScrollArea>
         </div>
       </main>
