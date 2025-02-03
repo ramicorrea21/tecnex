@@ -174,7 +174,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     if (!cart) return
     
     try {
-      setStatus('loading')
       if (quantity > MAX_QUANTITY_PER_ITEM) {
         toast({
           title: "Límite excedido",
@@ -184,7 +183,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         return
       }
 
-      const updatedCart: Cart = {
+      // Actualizar estado local primero
+      setCart({
         ...cart,
         items: cart.items.map(item =>
           item.productId === productId
@@ -192,10 +192,18 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
             : item
         ),
         lastModified: new Date()
-      }
+      })
 
-      await saveCart(cart.id, updatedCart)
-      setCart(updatedCart)
+      // Luego sincronizar con Firebase
+      await saveCart(cart.id, {
+        ...cart,
+        items: cart.items.map(item =>
+          item.productId === productId
+            ? { ...item, quantity }
+            : item
+        ),
+        lastModified: new Date()
+      })
     } catch (err) {
       console.error('Error updating quantity:', err)
       toast({
@@ -203,11 +211,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         description: "No se pudo actualizar la cantidad",
         variant: "destructive"
       })
-    } finally {
-      setStatus('idle')
     }
   }
-
   // Limpiar carrito
   const clearCart = async () => {
     if (!cart) return

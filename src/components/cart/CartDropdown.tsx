@@ -104,20 +104,27 @@ export function CartDropdown() {
                     </p>
                     
                     <div className="flex items-center gap-2">
-                      <select
-                        value={item.quantity}
-                        onChange={(e) => {
-                          const newQuantity = parseInt(e.target.value)
-                          updateQuantity(item.productId, newQuantity)
-                        }}
-                        className="h-8 w-20 rounded-md border bg-background px-2"
+                      <div className="flex items-center gap-2">
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        className="h-8 w-8"
+                        onClick={() => updateQuantity(item.productId, Math.max(1, item.quantity - 1))}
+                        disabled={item.quantity <= 1}
                       >
-                        {Array.from({length: 10}, (_, i) => i + 1).map((num) => (
-                          <option key={num} value={num}>
-                            {num}
-                          </option>
-                        ))}
-                      </select>
+                        -
+                      </Button>
+                      <span className="w-8 text-center">{item.quantity}</span>
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        className="h-8 w-8"
+                        onClick={() => updateQuantity(item.productId, Math.min(10, item.quantity + 1))}
+                        disabled={item.quantity >= 10}
+                      >
+                        +
+                      </Button>
+                    </div>
 
                       <Button
                         variant="ghost"
@@ -158,7 +165,7 @@ export function CartDropdown() {
               onClick={() => setIsOpen(false)}
               asChild
             >
-              <Link href="/checkout">
+              <Link href="/cart">
                 Finalizar Compra
               </Link>
             </Button>
