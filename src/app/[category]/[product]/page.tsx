@@ -1,16 +1,28 @@
 'use client'
 
+import { useState } from "react"
 import { use } from "react"
 import { useProducts } from "@/hooks/use-products"
+import { useCart } from "@/contexts/cart-context"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { MainNav } from "@/components/store/MainNav"
 import { CategoryNav } from "@/components/store/CategoryNav"
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 
 function ProductDetail({ productSlug }: { productSlug: string }) {
   const { products, loading, error } = useProducts()
+  const { addItem, MAX_QUANTITY_PER_ITEM } = useCart()
+  const [quantity, setQuantity] = useState(1)
+  const [isAdding, setIsAdding] = useState(false)
   
   if (error) {
     return <div className="text-red-500">{error}</div>
@@ -38,6 +50,19 @@ function ProductDetail({ productSlug }: { productSlug: string }) {
         <p className="text-muted-foreground">Producto no encontrado</p>
       </div>
     )
+  }
+
+  // Manejar el agregar al carrito
+  const handleAddToCart = async () => {
+    try {
+      setIsAdding(true)
+      await addItem(product, quantity)
+      setQuantity(1) // Reset quantity after adding
+    } catch (error) {
+      console.error('Error adding to cart:', error)
+    } finally {
+      setIsAdding(false)
+    }
   }
 
   return (
@@ -85,18 +110,46 @@ function ProductDetail({ productSlug }: { productSlug: string }) {
           {product.description}
         </p>
 
-        <div className="space-y-2">
+        <div className="space-y-4">
           <div className="flex items-center gap-2">
             <span className="font-medium">Stock:</span>
             <span className={product.stock > 0 ? 'text-green-600' : 'text-red-600'}>
               {product.stock > 0 ? `${product.stock} unidades` : 'Sin stock'}
             </span>
           </div>
-        </div>
 
-        <Button size="lg" className="w-full" disabled={product.stock === 0}>
-          {product.stock > 0 ? 'Agregar al carrito' : 'Sin stock'}
-        </Button>
+          {product.stock > 0 && (
+            <div className="flex items-center gap-4">
+              <Select
+                value={quantity.toString()}
+                onValueChange={(value) => setQuantity(Number(value))}
+              >
+                <SelectTrigger className="w-24">
+                  <SelectValue placeholder="Cantidad" />
+                </SelectTrigger>
+                <SelectContent>
+                  {Array.from(
+                    { length: Math.min(product.stock, MAX_QUANTITY_PER_ITEM) }, 
+                    (_, i) => i + 1
+                  ).map((num) => (
+                    <SelectItem key={num} value={num.toString()}>
+                      {num}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              <Button 
+                size="lg" 
+                className="flex-1"
+                onClick={handleAddToCart}
+                disabled={isAdding || product.stock === 0}
+              >
+                {isAdding ? 'Agregando...' : 'Agregar al carrito'}
+              </Button>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   )

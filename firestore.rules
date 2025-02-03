@@ -29,6 +29,11 @@ service cloud.firestore {
       allow read: if true;
       allow write: if isAdmin();
     }
+
+    // Carritos (acceso público ya que no hay autenticación)
+    match /carts/{cartId} {
+      allow read, create, update, delete: if true;
+    }
     
     // Por defecto, denegar todo
     match /{document=**} {

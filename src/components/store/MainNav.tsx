@@ -1,7 +1,6 @@
-import { Button } from "@/components/ui/button"
-import { ShoppingCart } from "lucide-react"
-import { SearchBar } from "./SearchBar"
 import Link from "next/link"
+import { SearchBar } from "./SearchBar"
+import { CartDropdown } from "../cart/CartDropdown"
 
 export function MainNav() {
   return (
@@ -15,27 +14,18 @@ export function MainNav() {
             </Link>
           </div>
 
-          {/* Search - hidden on mobile, shown on tablet and up */}
+          {/* Search - hidden on mobile */}
           <div className="hidden md:flex flex-1 items-center justify-center px-8">
             <SearchBar />
           </div>
 
           {/* Cart */}
           <div className="flex items-center gap-4">
-            <Button 
-              variant="outline" 
-              size="icon" 
-              className="h-10 w-10 md:h-12 md:w-12 relative"
-            >
-              <ShoppingCart className="h-5 w-5 md:h-6 md:w-6" />
-              <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                0
-              </span>
-            </Button>
+            <CartDropdown />
           </div>
         </div>
 
-        {/* Mobile Search - shown below nav on mobile only */}
+        {/* Mobile Search */}
         <div className="md:hidden py-4">
           <SearchBar />
         </div>

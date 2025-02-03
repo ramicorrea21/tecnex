@@ -107,11 +107,6 @@ function ProductGrid({ categorySlug }: { categorySlug: string }) {
                 )}
               </div>
             </CardContent>
-            <CardFooter className="p-4 pt-0">
-              <Button className="w-full" disabled={product.stock === 0}>
-                {product.stock > 0 ? 'Agregar al carrito' : 'Sin stock'}
-              </Button>
-            </CardFooter>
           </Card>
         </Link>
       ))}
