@@ -1,28 +1,72 @@
 rules_version = '2';
-service firebase.storage {
-  match /b/{bucket}/o {
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Función para verificar si el usuario está autenticado
     function isAuthenticated() {
       return request.auth != null;
     }
     
+    // Función para verificar si el usuario es administrador
     function isAdmin() {
       return isAuthenticated() && 
-        firestore.get(/databases/(default)/documents/admins/$(request.auth.uid)).data != null;
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+    
+    // Admins
+    match /admins/{userId} {
+      allow read, write: if isAdmin();
     }
 
-    // Products folder rules
-    match /products/{productId}/{fileName} {
+    // Productos (públicos para lectura, admin para escritura)
+    match /products/{productId} {
       allow read: if true;
       allow write: if isAdmin();
     }
 
-    // Cart images (temporary storage)
-    match /carts/{cartId}/{fileName} {
-      allow read, write: if true;
+    // Categorías (públicas para lectura, admin para escritura)
+    match /categories/{categoryId} {
+      allow read: if true;
+      allow write: if isAdmin();
     }
 
-    // Default deny
-    match /{allPaths=**} {
+    // Carritos (acceso público ya que no hay autenticación)
+    match /carts/{cartId} {
+      allow read, create, update, delete: if true;
+    }
+    
+    // Clientes (acceso público para crear y leer sus propios datos)
+    match /customers/{customerId} {
+      // Permitir crear nuevos clientes
+      allow create: if true;
+      
+      // Permitir leer y actualizar solo si el email coincide
+      allow read, update: if true;
+      // Más adelante podríamos restringir a:
+      // allow read, update: if request.auth != null && 
+      //    resource.data.email == request.auth.token.email;
+    }
+    
+    // Órdenes (públicas para crear, restringidas para leer)
+    match /orders/{orderId} {
+      // Permitir crear nuevas órdenes
+      allow create: if true;
+      
+      // Permitir leer solo si es el cliente de la orden o admin
+      allow read: if true;
+      // Más adelante podríamos restringir a:
+      // allow read: if isAdmin() || (
+      //    resource.data.customerId == request.auth.uid
+      // );
+      
+      // Solo permitir actualizar el estado del pago
+      allow update: if true && 
+        request.resource.data.diff(resource.data).affectedKeys()
+          .hasOnly(['paymentSuccessful', 'updatedAt']);
+    }
+    
+    // Por defecto, denegar todo
+    match /{document=**} {
       allow read, write: if false;
     }
   }
