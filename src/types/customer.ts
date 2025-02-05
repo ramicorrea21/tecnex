@@ -4,6 +4,7 @@ export interface Customer {
     lastName: string
     dni: string
     email: string
+    phone: string
     street: string
     streetNumber: string
     zipCode: string
@@ -17,6 +18,7 @@ export interface Customer {
     lastName: string
     dni: string
     email: string
+    phone: string
     street: string
     streetNumber: string
     zipCode: string

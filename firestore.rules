@@ -12,8 +12,17 @@ service cloud.firestore {
       return isAuthenticated() && 
         exists(/databases/$(database)/documents/admins/$(request.auth.uid));
     }
+
+    // Validar estructura de statusHistory
+    function isValidStatusHistory(history) {
+      return history is list && 
+        history.size() > 0 && 
+        'status' in history[0] &&
+        'timestamp' in history[0] &&
+        (!('note' in history[0]) || history[0].note is string);
+    }
     
-    // Colección para admins
+    // Admins
     match /admins/{userId} {
       allow read, write: if isAdmin();
     }
@@ -33,6 +42,65 @@ service cloud.firestore {
     // Carritos (acceso público ya que no hay autenticación)
     match /carts/{cartId} {
       allow read, create, update, delete: if true;
+    }
+    
+    // Clientes (acceso público para crear y leer sus propios datos)
+    match /customers/{customerId} {
+      // Validar estructura del cliente
+      function isValidCustomer() {
+        let requiredFields = ['firstName', 'lastName', 'dni', 'email', 'phone', 'street', 'streetNumber', 'zipCode'];
+        let data = request.resource.data;
+        
+        return requiredFields.hasAll(data.keys()) &&
+               data.keys().hasAll(requiredFields) &&
+               data.orderIds is list;
+      }
+      
+      // Permitir crear si los datos son válidos
+      allow create: if isValidCustomer();
+      
+      // Permitir leer y actualizar
+      allow read, update: if true;
+    }
+    
+    // Órdenes (públicas para crear, restringidas para leer)
+    match /orders/{orderId} {
+      // Validar estructura de la orden
+      function isValidOrder() {
+        let data = request.resource.data;
+        
+        return data.customerId is string &&
+               data.items is list &&
+               data.totalAmount is number &&
+               data.status is string &&
+               data.paymentStatus in ['pending', 'approved', 'rejected'] &&
+               (!('paymentId' in data) || data.paymentId is string) &&
+               isValidStatusHistory(data.statusHistory);
+      }
+      
+      // Validar actualización de estado
+      function isValidStatusUpdate() {
+        let diff = request.resource.data.diff(resource.data);
+        return diff.affectedKeys().hasOnly(['status', 'statusHistory', 'updatedAt']) &&
+               isValidStatusHistory(request.resource.data.statusHistory);
+      }
+
+      // Validar actualización de pago
+      function isValidPaymentUpdate() {
+        let diff = request.resource.data.diff(resource.data);
+        return diff.affectedKeys().hasOnly(['paymentId', 'paymentStatus', 'status', 'statusHistory', 'updatedAt']) &&
+               request.resource.data.paymentStatus in ['pending', 'approved', 'rejected'] &&
+               isValidStatusHistory(request.resource.data.statusHistory);
+      }
+      
+      // Permitir crear si los datos son válidos
+      allow create: if isValidOrder();
+      
+      // Permitir leer
+      allow read: if true;
+      
+      // Permitir actualizaciones específicas
+      allow update: if isValidStatusUpdate() || isValidPaymentUpdate();
     }
     
     // Por defecto, denegar todo

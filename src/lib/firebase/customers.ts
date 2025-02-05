@@ -26,6 +26,7 @@ function convertCustomer(doc: DocumentSnapshot): Customer | null {
     lastName: data?.lastName,
     dni: data?.dni,
     email: data?.email,
+    phone: data?.string,
     street: data?.street,
     streetNumber: data?.streetNumber,
     zipCode: data?.zipCode,

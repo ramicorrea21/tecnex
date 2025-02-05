@@ -1,7 +1,7 @@
 'use client'
 
-import Link from "next/link"
 import { useState } from "react"
+import Link from "next/link"
 import { ArrowLeft, Check, AlertCircle } from "lucide-react"
 import { useCart } from "@/contexts/cart-context"
 import { useCheckout } from "@/hooks/use-checkout"
@@ -24,6 +24,10 @@ import {
 } from "@/components/ui/card"
 import type { CustomerFormData } from "@/types/customer"
 
+interface FormErrors {
+  [key: string]: string
+}
+
 export default function CheckoutPage() {
   const { cart, status, totalItems, totalAmount } = useCart()
   const { 
@@ -41,10 +45,12 @@ export default function CheckoutPage() {
     lastName: '',
     dni: '',
     email: '',
+    phone: '',
     street: '',
     streetNumber: '',
     zipCode: ''
   })
+  const [errors, setErrors] = useState<FormErrors>({})
 
   if (!cart || status === 'loading') {
     return (
@@ -64,6 +70,13 @@ export default function CheckoutPage() {
       ...prev,
       [name]: value
     }))
+    // Limpiar error al modificar el campo
+    if (errors[name]) {
+      setErrors(prev => ({
+        ...prev,
+        [name]: ''
+      }))
+    }
   }
 
   const renderStepIndicator = () => (
@@ -100,7 +113,7 @@ export default function CheckoutPage() {
           </Alert>
         )}
         
-        {/* Primera fila */}
+        {/* Primera fila - Nombre y Apellido */}
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label htmlFor="firstName">Nombre</Label>
@@ -109,7 +122,11 @@ export default function CheckoutPage() {
               name="firstName"
               value={formData.firstName}
               onChange={handleInputChange}
+              className={errors.firstName ? "border-red-500" : ""}
             />
+            {errors.firstName && (
+              <p className="text-sm text-red-500">{errors.firstName}</p>
+            )}
           </div>
           <div className="space-y-2">
             <Label htmlFor="lastName">Apellido</Label>
@@ -118,12 +135,16 @@ export default function CheckoutPage() {
               name="lastName"
               value={formData.lastName}
               onChange={handleInputChange}
+              className={errors.lastName ? "border-red-500" : ""}
             />
+            {errors.lastName && (
+              <p className="text-sm text-red-500">{errors.lastName}</p>
+            )}
           </div>
         </div>
 
-        {/* Segunda fila */}
-        <div className="grid grid-cols-2 gap-4">
+        {/* Segunda fila - DNI, Email y Teléfono */}
+        <div className="grid grid-cols-3 gap-4">
           <div className="space-y-2">
             <Label htmlFor="dni">DNI</Label>
             <Input
@@ -131,7 +152,11 @@ export default function CheckoutPage() {
               name="dni"
               value={formData.dni}
               onChange={handleInputChange}
+              className={errors.dni ? "border-red-500" : ""}
             />
+            {errors.dni && (
+              <p className="text-sm text-red-500">{errors.dni}</p>
+            )}
           </div>
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
@@ -141,11 +166,30 @@ export default function CheckoutPage() {
               type="email"
               value={formData.email}
               onChange={handleInputChange}
+              className={errors.email ? "border-red-500" : ""}
             />
+            {errors.email && (
+              <p className="text-sm text-red-500">{errors.email}</p>
+            )}
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="phone">Teléfono (WhatsApp)</Label>
+            <Input
+              id="phone"
+              name="phone"
+              type="tel"
+              placeholder="11 1234-5678"
+              value={formData.phone}
+              onChange={handleInputChange}
+              className={errors.phone ? "border-red-500" : ""}
+            />
+            {errors.phone && (
+              <p className="text-sm text-red-500">{errors.phone}</p>
+            )}
           </div>
         </div>
 
-        {/* Tercera fila */}
+        {/* Tercera fila - Dirección */}
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label htmlFor="street">Calle</Label>
@@ -154,7 +198,11 @@ export default function CheckoutPage() {
               name="street"
               value={formData.street}
               onChange={handleInputChange}
+              className={errors.street ? "border-red-500" : ""}
             />
+            {errors.street && (
+              <p className="text-sm text-red-500">{errors.street}</p>
+            )}
           </div>
           <div className="space-y-2">
             <Label htmlFor="streetNumber">Número</Label>
@@ -163,11 +211,15 @@ export default function CheckoutPage() {
               name="streetNumber"
               value={formData.streetNumber}
               onChange={handleInputChange}
+              className={errors.streetNumber ? "border-red-500" : ""}
             />
+            {errors.streetNumber && (
+              <p className="text-sm text-red-500">{errors.streetNumber}</p>
+            )}
           </div>
         </div>
 
-        {/* Cuarta fila */}
+        {/* Cuarta fila - Código Postal */}
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label htmlFor="zipCode">Código Postal</Label>
@@ -176,7 +228,11 @@ export default function CheckoutPage() {
               name="zipCode"
               value={formData.zipCode}
               onChange={handleInputChange}
+              className={errors.zipCode ? "border-red-500" : ""}
             />
+            {errors.zipCode && (
+              <p className="text-sm text-red-500">{errors.zipCode}</p>
+            )}
           </div>
         </div>
       </CardContent>

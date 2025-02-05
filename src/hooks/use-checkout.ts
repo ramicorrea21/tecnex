@@ -3,6 +3,7 @@ import { useCart } from '@/contexts/cart-context'
 import { saveCustomer } from '@/lib/firebase/customers'
 import { createOrder, updateOrderPayment } from '@/lib/firebase/orders'
 import type { CustomerFormData } from '@/types/customer'
+import { OrderStatus } from '@/types/order'
 
 export type CheckoutStep = 'customer-info' | 'payment' | 'confirmation'
 
@@ -20,29 +21,43 @@ export function useCheckout() {
   const [customerId, setCustomerId] = useState<string | null>(null)
 
   // Validar los datos del cliente
-  const validateCustomerData = (data: CustomerFormData): boolean => {
-    // Reglas de validación
-    if (!data.firstName || !data.lastName || !data.dni || !data.email ||
-        !data.street || !data.streetNumber || !data.zipCode) {
-      return false
+  const validateCustomerData = (data: CustomerFormData): { isValid: boolean; errors: { [key: string]: string } } => {
+    const errors: { [key: string]: string } = {}
+
+    if (!data.firstName) errors.firstName = 'El nombre es requerido'
+    if (!data.lastName) errors.lastName = 'El apellido es requerido'
+    
+    if (!data.dni) {
+      errors.dni = 'El DNI es requerido'
+    } else if (!/^\d{7,8}$/.test(data.dni)) {
+      errors.dni = 'DNI inválido'
     }
 
-    // Validar DNI
-    if (!/^\d{7,8}$/.test(data.dni)) {
-      return false
+    if (!data.email) {
+      errors.email = 'El email es requerido'
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
+      errors.email = 'Email inválido'
     }
 
-    // Validar email
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
-      return false
+    if (!data.phone) {
+      errors.phone = 'El teléfono es requerido'
+    } else if (!/^(\+)?[\d\s-]{10,}$/.test(data.phone)) {
+      errors.phone = 'Teléfono inválido'
     }
 
-    // Validar código postal
-    if (!/^\d{4}$/.test(data.zipCode)) {
-      return false
+    if (!data.street) errors.street = 'La calle es requerida'
+    if (!data.streetNumber) errors.streetNumber = 'El número es requerido'
+    
+    if (!data.zipCode) {
+      errors.zipCode = 'El código postal es requerido'
+    } else if (!/^\d{4}$/.test(data.zipCode)) {
+      errors.zipCode = 'Código postal inválido'
     }
 
-    return true
+    return {
+      isValid: Object.keys(errors).length === 0,
+      errors
+    }
   }
 
   // Procesar los datos del cliente
@@ -51,28 +66,47 @@ export function useCheckout() {
       setIsProcessing(true)
       setError(null)
 
-      if (!validateCustomerData(data)) {
-        throw new Error('Datos del cliente inválidos')
+      const validation = validateCustomerData(data)
+      if (!validation.isValid) {
+        setError({
+          step: 'customer-info',
+          message: 'Por favor, revisa los campos marcados en rojo'
+        })
+        return validation.errors
       }
 
+      // Guardar o actualizar cliente
       const savedCustomerId = await saveCustomer({
         firstName: data.firstName,
         lastName: data.lastName,
         dni: data.dni,
         email: data.email,
+        phone: data.phone,
         street: data.street,
         streetNumber: data.streetNumber,
         zipCode: data.zipCode
       })
 
+      // Crear orden inicial
+      if (cart) {
+        const newOrderId = await createOrder(
+          savedCustomerId,
+          cart.items,
+          totalAmount
+        )
+        setOrderId(newOrderId)
+      }
+
       setCustomerId(savedCustomerId)
       setCurrentStep('payment')
+      return null
     } catch (err) {
       setError({
         step: 'customer-info',
         message: 'Error al procesar los datos del cliente'
       })
       console.error('Error processing customer info:', err)
+      return null
     } finally {
       setIsProcessing(false)
     }
@@ -80,7 +114,7 @@ export function useCheckout() {
 
   // Procesar el pago
   const processPayment = async () => {
-    if (!customerId || !cart) {
+    if (!customerId || !cart || !orderId) {
       setError({
         step: 'payment',
         message: 'Error al procesar el pago: información faltante'
@@ -92,22 +126,17 @@ export function useCheckout() {
       setIsProcessing(true)
       setError(null)
 
-      // Crear la orden primero
-      const newOrderId = await createOrder(
-        customerId,
-        cart.items,
-        totalAmount
-      )
-      setOrderId(newOrderId)
-
       // Aquí iría la integración con Mercado Pago
-      // Por ahora simulamos un pago exitoso
       const paymentResult = await simulatePayment()
 
       // Actualizar el estado del pago en la orden
-      await updateOrderPayment(newOrderId, paymentResult.success)
+      await updateOrderPayment(
+        orderId,
+        paymentResult.paymentId,
+        paymentResult.status
+      )
 
-      if (paymentResult.success) {
+      if (paymentResult.status === 'approved') {
         clearCart()
         setCurrentStep('confirmation')
       } else {
@@ -126,9 +155,12 @@ export function useCheckout() {
 
   // Simulación temporal del pago
   const simulatePayment = async () => {
-    return new Promise<{ success: boolean }>((resolve) => {
+    return new Promise<{ status: 'approved' | 'rejected', paymentId: string }>((resolve) => {
       setTimeout(() => {
-        resolve({ success: true })
+        resolve({ 
+          status: 'approved',
+          paymentId: `MP_${Date.now()}`
+        })
       }, 2000)
     })
   }
