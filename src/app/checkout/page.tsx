@@ -2,12 +2,14 @@
 
 import { useState } from "react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { ArrowLeft, Check, AlertCircle } from "lucide-react"
 import { useCart } from "@/contexts/cart-context"
 import { useCheckout } from "@/hooks/use-checkout"
 import { formatPrice } from "@/lib/cart-utils"
 import { MainNav } from "@/components/store/MainNav"
 import { CategoryNav } from "@/components/store/CategoryNav"
+import { MercadoPagoButton } from "@/components/checkout/MercadoPagoButton"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -29,14 +31,16 @@ interface FormErrors {
 }
 
 export default function CheckoutPage() {
+  const router = useRouter()
   const { cart, status, totalItems, totalAmount } = useCart()
   const { 
     currentStep,
     isProcessing,
     error,
     orderId,
+    preferenceId,
     processCustomerInfo,
-    processPayment,
+    handlePaymentResult,
     resetCheckout
   } = useCheckout()
 
@@ -270,17 +274,18 @@ export default function CheckoutPage() {
           </Alert>
         )}
         
-        <Button 
-          className="w-full h-24 text-lg"
-          onClick={processPayment}
-          disabled={isProcessing}
-        >
-          {isProcessing ? (
-            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white" />
-          ) : (
-            'Pagar con Mercado Pago'
-          )}
-        </Button>
+        {preferenceId ? (
+          <MercadoPagoButton 
+            preferenceId={preferenceId}
+            onSuccess={() => handlePaymentResult(preferenceId, 'approved')}
+            onFailure={() => handlePaymentResult(preferenceId, 'rejected')}
+            onPending={() => handlePaymentResult(preferenceId, 'pending')}
+          />
+        ) : (
+          <div className="w-full h-24 flex items-center justify-center">
+            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary" />
+          </div>
+        )}
       </CardContent>
       <CardFooter>
         <Button 
@@ -313,11 +318,9 @@ export default function CheckoutPage() {
       <CardFooter className="flex flex-col gap-4">
         <Button 
           className="w-full" 
-          asChild
+          onClick={() => router.push('/')}
         >
-          <Link href="/">
-            Volver a la tienda
-          </Link>
+          Volver a la tienda
         </Button>
       </CardFooter>
     </Card>

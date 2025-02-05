@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useCart } from '@/contexts/cart-context'
 import { saveCustomer } from '@/lib/firebase/customers'
 import { createOrder, updateOrderPayment } from '@/lib/firebase/orders'
+import { createPaymentPreference } from '@/lib/mercadopago'
 import type { CustomerFormData } from '@/types/customer'
 import { OrderStatus } from '@/types/order'
 
@@ -19,6 +20,7 @@ export function useCheckout() {
   const [error, setError] = useState<CheckoutError | null>(null)
   const [orderId, setOrderId] = useState<string | null>(null)
   const [customerId, setCustomerId] = useState<string | null>(null)
+  const [preferenceId, setPreferenceId] = useState<string | null>(null)
 
   // Validar los datos del cliente
   const validateCustomerData = (data: CustomerFormData): { isValid: boolean; errors: { [key: string]: string } } => {
@@ -60,12 +62,13 @@ export function useCheckout() {
     }
   }
 
-  // Procesar los datos del cliente
+  // Procesar los datos del cliente y crear orden
   const processCustomerInfo = async (data: CustomerFormData) => {
     try {
       setIsProcessing(true)
       setError(null)
 
+      // Validar datos del cliente
       const validation = validateCustomerData(data)
       if (!validation.isValid) {
         setError({
@@ -95,6 +98,21 @@ export function useCheckout() {
           totalAmount
         )
         setOrderId(newOrderId)
+
+        // Crear preferencia de MP
+        const customer = {
+          ...data,
+          id: savedCustomerId,
+          orderIds: [],
+          createdAt: new Date(),
+          updatedAt: new Date()
+        }
+        const preference = await createPaymentPreference(
+          newOrderId,
+          cart.items,
+          customer
+        )
+        setPreferenceId(preference.id)
       }
 
       setCustomerId(savedCustomerId)
@@ -112,57 +130,47 @@ export function useCheckout() {
     }
   }
 
-  // Procesar el pago
-  const processPayment = async () => {
-    if (!customerId || !cart || !orderId) {
-      setError({
-        step: 'payment',
-        message: 'Error al procesar el pago: información faltante'
-      })
-      return
-    }
-
+  // Manejar el resultado del pago
+  const handlePaymentResult = async (
+    paymentId: string, 
+    status: 'approved' | 'rejected' | 'pending'
+  ) => {
     try {
       setIsProcessing(true)
       setError(null)
 
-      // Aquí iría la integración con Mercado Pago
-      const paymentResult = await simulatePayment()
+      if (!orderId) {
+        throw new Error('No hay orden activa')
+      }
 
-      // Actualizar el estado del pago en la orden
-      await updateOrderPayment(
-        orderId,
-        paymentResult.paymentId,
-        paymentResult.status
-      )
+      // Actualizar estado del pago en la orden
+      await updateOrderPayment(orderId, paymentId, status)
 
-      if (paymentResult.status === 'approved') {
+      if (status === 'approved') {
         clearCart()
         setCurrentStep('confirmation')
+      } else if (status === 'pending') {
+        // Manejar pago pendiente
+        setError({
+          step: 'payment',
+          message: 'El pago está pendiente de confirmación'
+        })
       } else {
-        throw new Error('Pago rechazado')
+        // Manejar pago rechazado
+        setError({
+          step: 'payment',
+          message: 'El pago fue rechazado. Por favor, intenta con otro método.'
+        })
       }
     } catch (err) {
       setError({
         step: 'payment',
-        message: 'Error al procesar el pago'
+        message: 'Error al procesar el resultado del pago'
       })
-      console.error('Error processing payment:', err)
+      console.error('Error handling payment result:', err)
     } finally {
       setIsProcessing(false)
     }
-  }
-
-  // Simulación temporal del pago
-  const simulatePayment = async () => {
-    return new Promise<{ status: 'approved' | 'rejected', paymentId: string }>((resolve) => {
-      setTimeout(() => {
-        resolve({ 
-          status: 'approved',
-          paymentId: `MP_${Date.now()}`
-        })
-      }, 2000)
-    })
   }
 
   // Reiniciar el proceso
@@ -171,6 +179,7 @@ export function useCheckout() {
     setError(null)
     setOrderId(null)
     setCustomerId(null)
+    setPreferenceId(null)
     setIsProcessing(false)
   }
 
@@ -179,8 +188,10 @@ export function useCheckout() {
     isProcessing,
     error,
     orderId,
+    customerId,
+    preferenceId,
     processCustomerInfo,
-    processPayment,
+    handlePaymentResult,
     resetCheckout
   }
 }

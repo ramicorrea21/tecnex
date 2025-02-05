@@ -137,11 +137,10 @@ export async function updateOrderStatus(
     }
   }
 
-// Actualizar estado del pago
 export async function updateOrderPayment(
     orderId: string, 
     paymentId: string,
-    status: 'approved' | 'rejected'
+    status: 'approved' | 'rejected' | 'pending'
   ): Promise<void> {
     try {
       const orderRef = doc(db, COLLECTION, orderId)
@@ -160,6 +159,21 @@ export async function updateOrderPayment(
           status: OrderStatus.PAYMENT_CONFIRMED,
           timestamp: now,
           note: `Pago confirmado (ID: ${paymentId})`
+        })
+      } else if (status === 'pending') {
+        updates.status = OrderStatus.PENDING_PAYMENT
+        updates.statusHistory = arrayUnion({
+          status: OrderStatus.PENDING_PAYMENT,
+          timestamp: now,
+          note: `Pago pendiente (ID: ${paymentId})`
+        })
+      } else {
+        // Si el pago es rechazado
+        updates.status = OrderStatus.REGISTERED
+        updates.statusHistory = arrayUnion({
+          status: OrderStatus.REGISTERED,
+          timestamp: now,
+          note: `Pago rechazado (ID: ${paymentId})`
         })
       }
   
