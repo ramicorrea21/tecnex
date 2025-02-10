@@ -28,7 +28,9 @@ export function MercadoPagoButton({
    if (sdkLoaded && preferenceId) {
      console.log("Iniciando MP con:", preferenceId)
      try {
-       const mp = new window.MercadoPago('APP_USR-3a528210-535d-4b95-82c0-1de8c2ab139c')
+      const mp = new window.MercadoPago('APP_USR-360e1911-128f-4061-8201-fe3f4dc8610a', {
+        locale: 'es-AR'
+      })
        
        mp.bricks().create("wallet", "wallet_container", {
          initialization: {

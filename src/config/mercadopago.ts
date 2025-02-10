@@ -7,5 +7,5 @@ export const MERCADOPAGO_CONFIG = {
   FAILURE_URL: `${process.env.NEXT_PUBLIC_BASE_URL}/checkout/failure`,
   PENDING_URL: `${process.env.NEXT_PUBLIC_BASE_URL}/checkout/pending`,
   WEBHOOK_URL: `${process.env.NEXT_PUBLIC_BASE_URL}/api/webhook/mercadopago`,
-  STORE_NAME: 'tecnex'
- } as const
+  STORE_NAME: 'tecne-test'
+} as const

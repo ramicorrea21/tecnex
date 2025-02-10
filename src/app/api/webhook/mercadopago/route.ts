@@ -40,11 +40,10 @@ export async function POST(request: Request) {
 
     // Obtener el ID de la orden desde la referencia externa
     const response = await fetch(
-      
       `https://api.mercadopago.com/v1/payments/${paymentId}`,
       {
         headers: {
-          'Authorization': `Bearer APP_USR-85580567507693-021016-f0613f55350f73fd1491405b83328c30-1541952501`,
+          'Authorization': `Bearer ${process.env.MP_ACCESS_TOKEN}`,
         }
       }
     )
