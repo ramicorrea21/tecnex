@@ -112,7 +112,7 @@ export async function getPaymentStatus(paymentId: string): Promise<PaymentStatus
   try {
     const response = await fetch(`https://api.mercadopago.com/v1/payments/${paymentId}`, {
       headers: {
-        'Authorization': `Bearer ${MERCADOPAGO_CONFIG.ACCESS_TOKEN}`,
+        'Authorization': `Bearer APP_USR-85580567507693-021016-f0613f55350f73fd1491405b83328c30-1541952501`,
         'X-Integrator-Id': MERCADOPAGO_CONFIG.INTEGRATOR_ID
       }
     })
