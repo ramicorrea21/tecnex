@@ -13,7 +13,11 @@ export default function CheckoutSuccessPage() {
   // Limpiar el carrito y estados al montar
   useEffect(() => {
     // Aquí podríamos limpiar el carrito si no se hizo antes
+
   }, [])
+
+  console.log(process.env.MP_ACCESS_TOKEN);
+  console.log('HOLA');
 
   return (
     <div className="flex min-h-screen items-center justify-center p-4">

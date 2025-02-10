@@ -13,7 +13,7 @@ export interface MercadoPagoItem {
     items: MercadoPagoItem[]
     payer: {
       name: string
-      surname: string
+      surname: string 
       email: string
       phone: {
         area_code: string
@@ -26,7 +26,7 @@ export interface MercadoPagoItem {
       address: {
         street_name: string
         street_number: string
-        zip_code: string
+        zip_code: string 
       }
     }
     back_urls: {
@@ -34,13 +34,12 @@ export interface MercadoPagoItem {
       failure: string
       pending: string
     }
-    auto_return: string
     notification_url: string
     statement_descriptor: string
     external_reference: string
     expires: boolean
-  }
-  
+    auto_return: string
+   }
   export interface MercadoPagoPreferenceResponse {
     id: string
     init_point: string

@@ -32,8 +32,13 @@ interface FormErrors {
 
 export default function CheckoutPage() {
   const router = useRouter()
-  const { cart, status, totalItems, totalAmount } = useCart()
   const { 
+    cart, 
+    status, 
+    totalItems, 
+    totalAmount 
+  } = useCart()
+  const {
     currentStep,
     isProcessing,
     error,
@@ -43,6 +48,7 @@ export default function CheckoutPage() {
     handlePaymentResult,
     resetCheckout
   } = useCheckout()
+ 
 
   const [formData, setFormData] = useState<CustomerFormData>({
     firstName: '',
@@ -256,6 +262,7 @@ export default function CheckoutPage() {
     </Card>
   )
 
+
   const renderPaymentForm = () => (
     <Card>
       <CardHeader>
@@ -274,17 +281,31 @@ export default function CheckoutPage() {
           </Alert>
         )}
         
-        {preferenceId ? (
+        {preferenceId && (
           <MercadoPagoButton 
             preferenceId={preferenceId}
-            onSuccess={() => handlePaymentResult(preferenceId, 'approved')}
-            onFailure={() => handlePaymentResult(preferenceId, 'rejected')}
-            onPending={() => handlePaymentResult(preferenceId, 'pending')}
+            onSuccess={() => {
+              const urlParams = new URLSearchParams(window.location.search)
+              const paymentId = urlParams.get('payment_id')
+              if (paymentId) {
+                handlePaymentResult(paymentId, 'approved')
+              }
+            }}
+            onFailure={() => {
+              const urlParams = new URLSearchParams(window.location.search)
+              const paymentId = urlParams.get('payment_id')
+              if (paymentId) {
+                handlePaymentResult(paymentId, 'rejected')
+              }
+            }}
+            onPending={() => {
+              const urlParams = new URLSearchParams(window.location.search)
+              const paymentId = urlParams.get('payment_id')
+              if (paymentId) {
+                handlePaymentResult(paymentId, 'pending')
+              }
+            }}
           />
-        ) : (
-          <div className="w-full h-24 flex items-center justify-center">
-            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary" />
-          </div>
         )}
       </CardContent>
       <CardFooter>
@@ -294,7 +315,7 @@ export default function CheckoutPage() {
           onClick={resetCheckout}
           disabled={isProcessing}
         >
-          Volver a datos personales
+          Volver
         </Button>
       </CardFooter>
     </Card>

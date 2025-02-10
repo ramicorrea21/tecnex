@@ -5,6 +5,10 @@ import { verifyWebhookSignature } from '@/lib/mercadopago'
 import type { PaymentNotification } from '@/types/mercadopago'
 
 export async function POST(request: Request) {
+  console.log(process.env.MP_ACCESS_TOKEN);
+  console.log('HOLA');
+
+  
   try {
     // Verificar la firma del webhook
     const signature = request.headers.get('x-signature') || ''
@@ -36,8 +40,10 @@ export async function POST(request: Request) {
     const paymentId = notification.data.id
     const paymentStatus = await getPaymentStatus(paymentId)
 
+
     // Obtener el ID de la orden desde la referencia externa
     const response = await fetch(
+      
       `https://api.mercadopago.com/v1/payments/${paymentId}`,
       {
         headers: {
