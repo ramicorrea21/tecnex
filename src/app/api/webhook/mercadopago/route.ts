@@ -5,10 +5,7 @@ import { verifyWebhookSignature } from '@/lib/mercadopago'
 import type { PaymentNotification } from '@/types/mercadopago'
 
 export async function POST(request: Request) {
-  console.log(process.env.MP_ACCESS_TOKEN);
-  console.log('HOLA');
 
-  
   try {
     // Verificar la firma del webhook
     const signature = request.headers.get('x-signature') || ''
@@ -47,7 +44,7 @@ export async function POST(request: Request) {
       `https://api.mercadopago.com/v1/payments/${paymentId}`,
       {
         headers: {
-          'Authorization': `Bearer ${process.env.MP_ACCESS_TOKEN}`,
+          'Authorization': `Bearer APP_USR-85580567507693-021016-f0613f55350f73fd1491405b83328c30-1541952501`,
         }
       }
     )

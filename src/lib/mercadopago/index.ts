@@ -87,7 +87,7 @@ export async function createPaymentPreference(
   const response = await fetch('https://api.mercadopago.com/checkout/preferences', {
     method: 'POST',
     headers: {
-      Authorization: `Bearer  APP_USR-85580567507693-021016-f0613f55350f73fd1491405b83328c30-1541952501`,
+      Authorization: `Bearer APP_USR-85580567507693-021016-f0613f55350f73fd1491405b83328c30-1541952501`,
       'Content-Type': 'application/json'
     },
     body: JSON.stringify(preference)
