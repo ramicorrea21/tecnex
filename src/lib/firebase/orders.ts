@@ -17,8 +17,10 @@ import { OrderStatus } from '@/types/order'
 import type { Order, OrderStatusUpdate } from '@/types/order'
 import { addOrderToCustomer } from './customers'
 import type { CartItem } from '@/types/cart'
-
+import { sendOrderStatusEmail } from '@/lib/email'
+import { getCustomer } from './customers'
 const COLLECTION = 'orders'
+
 
 function convertOrder(doc: DocumentSnapshot): Order | null {
   if (!doc.exists()) return null
@@ -115,28 +117,31 @@ export async function getCustomerOrders(customerId: string): Promise<Order[]> {
 
 // Actualizar estado de una orden
 export async function updateOrderStatus(
-    orderId: string, 
-    update: OrderStatusUpdate
-  ): Promise<void> {
-    try {
-      const orderRef = doc(db, COLLECTION, orderId)
-      const now = new Date()
-  
-      await updateDoc(orderRef, {
-        status: update.status,
-        statusHistory: arrayUnion({
-          status: update.status,
-          timestamp: now,
-          note: update.note
-        }),
-        updatedAt: serverTimestamp()
-      })
-    } catch (error) {
-      console.error('Error updating order status:', error)
-      throw error
-    }
-  }
+  orderId: string, 
+  update: OrderStatusUpdate
+): Promise<void> {
+  try {
+    const orderRef = doc(db, 'orders', orderId)
+    const now = new Date()
 
+    // Creamos el objeto de historial asegurándonos que no hay undefined
+    const historyEntry = {
+      status: update.status,
+      timestamp: now,
+      note: update.note || '' // Si no hay nota, usamos string vacío
+    }
+
+    await updateDoc(orderRef, {
+      status: update.status,
+      statusHistory: arrayUnion(historyEntry),
+      updatedAt: serverTimestamp()
+    })
+
+  } catch (error) {
+    console.error('Error updating order status:', error)
+    throw error
+  }
+}
 export async function updateOrderPayment(
     orderId: string, 
     paymentId: string,

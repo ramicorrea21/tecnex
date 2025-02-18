@@ -28,7 +28,7 @@ export function MercadoPagoButton({
    if (sdkLoaded && preferenceId) {
      console.log("Iniciando MP con:", preferenceId)
      try {
-      const mp = new window.MercadoPago('APP_USR-360e1911-128f-4061-8201-fe3f4dc8610a', {
+      const mp = new window.MercadoPago('APP_USR-3e907310-8579-4618-a3f6-db25022479e5', {
         locale: 'es-AR'
       })
        
