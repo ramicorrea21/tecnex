@@ -21,34 +21,49 @@ export function useOrderDetails(orderId: string | null) {
   })
 
   useEffect(() => {
+    // Si no hay orderId, no hacer nada
     if (!orderId) return
-
-    const fetchDetails = async () => {
+    
+    let isMounted = true
+    
+    async function fetchDetails() {
       try {
-        setDetails(prev => ({ ...prev, isLoading: true, error: null }))
+        if (isMounted) setDetails(prev => ({ ...prev, isLoading: true, error: null }))
         
-        const orderData = await getOrder(orderId)
+        // Usamos type assertion para asegurar a TypeScript que orderId no es null
+        // Ya verificamos esto con el if (!orderId) return
+        const orderData = await getOrder(orderId as string) // Línea 35
         if (!orderData) throw new Error('Orden no encontrada')
         
+        // Obtener cliente
         const customerData = await getCustomer(orderData.customerId)
         if (!customerData) throw new Error('Cliente no encontrado')
-
-        setDetails({
-          order: orderData,
-          customer: customerData,
-          isLoading: false,
-          error: null
-        })
+        
+        if (isMounted) {
+          setDetails({
+            order: orderData,
+            customer: customerData,
+            isLoading: false,
+            error: null
+          })
+        }
       } catch (err) {
-        setDetails(prev => ({
-          ...prev,
-          isLoading: false,
-          error: err instanceof Error ? err : new Error('Error al cargar detalles')
-        }))
+        if (isMounted) {
+          console.error('Error fetching order details:', err)
+          setDetails(prev => ({
+            ...prev,
+            isLoading: false,
+            error: err instanceof Error ? err : new Error('Error desconocido')
+          }))
+        }
       }
     }
-
+    
     fetchDetails()
+    
+    return () => {
+      isMounted = false
+    }
   }, [orderId])
 
   return details

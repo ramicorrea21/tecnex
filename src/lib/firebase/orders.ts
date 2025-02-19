@@ -115,13 +115,14 @@ export async function getCustomerOrders(customerId: string): Promise<Order[]> {
   }
 }
 
-// Actualizar estado de una orden
+// src/lib/firebase/orders.ts (solo la función updateOrderStatus)
+
 export async function updateOrderStatus(
   orderId: string, 
   update: OrderStatusUpdate
 ): Promise<void> {
   try {
-    const orderRef = doc(db, 'orders', orderId)
+    const orderRef = doc(db, COLLECTION, orderId)
     const now = new Date()
 
     // Creamos el objeto de historial asegurándonos que no hay undefined
