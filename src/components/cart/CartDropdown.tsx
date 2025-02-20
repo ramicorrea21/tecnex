@@ -33,13 +33,13 @@ export function CartDropdown() {
   if (!cart || status === 'loading') {
     return (
       <Button 
-        variant="outline" 
+        variant="ghost" 
         size="icon" 
-        className="h-10 w-10 md:h-12 md:w-12 relative"
+        className="h-10 w-10 relative rounded-full hover:bg-gray-100"
         disabled
       >
-        <ShoppingBag className="h-5 w-5 md:h-6 md:w-6" />
-        <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-xs rounded-full h-5 w-5 flex items-center justify-center">
+        <ShoppingBag className="h-5 w-5 text-gray-600" />
+        <span className="absolute -top-1 -right-1 bg-blue-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
           0
         </span>
       </Button>
@@ -50,13 +50,13 @@ export function CartDropdown() {
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <SheetTrigger asChild>
         <Button 
-          variant="outline" 
+          variant="ghost" 
           size="icon" 
-          className="h-10 w-10 md:h-12 md:w-12 relative"
+          className="h-10 w-10 relative rounded-full hover:bg-gray-100"
         >
-          <ShoppingBag className="h-5 w-5 md:h-6 md:w-6" />
+          <ShoppingBag className="h-5 w-5 text-gray-600" />
           {totalItems > 0 && (
-            <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-xs rounded-full h-5 w-5 flex items-center justify-center">
+            <span className="absolute -top-1 -right-1 bg-blue-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
               {totalItems}
             </span>
           )}
@@ -159,7 +159,7 @@ export function CartDropdown() {
             </div>
             
             <Button 
-              className="w-full"
+              className="w-full bg-blue-600 hover:bg-blue-700"
               size="lg"
               disabled={cart.items.length === 0}
               onClick={() => setIsOpen(false)}

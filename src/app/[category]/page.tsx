@@ -1,6 +1,8 @@
 'use client'
 
 import { use } from "react"
+import { useEffect, useState } from "react"
+import { useSearchParams } from "next/navigation"
 import { useProducts } from "@/hooks/use-products"
 import { useCategories } from "@/hooks/use-categories"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
@@ -12,9 +14,10 @@ import { MainNav } from "@/components/store/MainNav"
 import { CategoryNav } from "@/components/store/CategoryNav"
 import Link from "next/link"
 
-function ProductGrid({ categorySlug }: { categorySlug: string }) {
-  const { products, loading: productsLoading, error: productsError } = useProducts()
+function ProductGrid({ categorySlug, brandFilter }: { categorySlug: string, brandFilter?: string }) {
+  const { products, loading: productsLoading, error: productsError, updateFilters } = useProducts()
   const { categories, loading: categoriesLoading, error: categoriesError } = useCategories()
+  const [filteredProducts, setFilteredProducts] = useState<any[]>([])
 
   // Normalizar el slug: convertir espacios a guiones y asegurar que termine en guión
   const normalizedSlug = categorySlug
@@ -26,9 +29,20 @@ function ProductGrid({ categorySlug }: { categorySlug: string }) {
   const category = categories.find(cat => cat.slug === normalizedSlug)
   const categoryId = category?.id
 
-  // Filtramos los productos que coincidan con la categoría actual
-  const categoryProducts = products.filter(product => product.categoryId === categoryId)
+  // Filtrar productos cuando cambian los parámetros
+  useEffect(() => {
+    if (!categoryId) return
 
+    // Actualizar los filtros para los hooks internos
+    const filters = {
+      category: categoryId,
+      ...(brandFilter ? { brand: brandFilter } : {})
+    }
+    
+    updateFilters(filters)
+  }, [categoryId, brandFilter, updateFilters])
+
+  // Renderizar el estado de carga
   if (productsError || categoriesError) {
     return <div className="text-red-500">{productsError || categoriesError}</div>
   }
@@ -59,17 +73,21 @@ function ProductGrid({ categorySlug }: { categorySlug: string }) {
     )
   }
 
-  if (categoryProducts.length === 0) {
+  if (products.length === 0) {
     return (
       <div className="text-center py-10">
-        <p className="text-muted-foreground">No hay productos en esta categoría</p>
+        <p className="text-muted-foreground">
+          {brandFilter 
+            ? `No hay productos de la marca ${brandFilter} en esta categoría` 
+            : 'No hay productos en esta categoría'}
+        </p>
       </div>
     )
   }
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-      {categoryProducts.map((product) => (
+      {products.map((product) => (
         <Link 
           key={product.id} 
           href={`/${categorySlug}/${product.slug}`}
@@ -120,6 +138,8 @@ export default function CategoryPage({
   params: Promise<{ category: string }>
 }) {
   const { category } = use(params)
+  const searchParams = useSearchParams()
+  const brandFilter = searchParams.get('brand')
   const decodedCategory = decodeURIComponent(category).trim()
   
   return (
@@ -129,10 +149,23 @@ export default function CategoryPage({
       <main className="flex-1">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <ScrollArea className="h-full">
-            <h1 className="text-2xl font-bold mb-6">
-              {decodedCategory}
-            </h1>
-            <ProductGrid categorySlug={decodedCategory} />
+            <div className="flex items-baseline justify-between mb-6">
+              <h1 className="text-2xl font-bold">
+                {decodedCategory}
+              </h1>
+              {brandFilter && (
+                <div className="flex items-center">
+                  <span className="text-sm text-muted-foreground mr-2">Filtrado por:</span>
+                  <Badge variant="outline" className="bg-blue-50">
+                    {brandFilter}
+                  </Badge>
+                </div>
+              )}
+            </div>
+            <ProductGrid 
+              categorySlug={decodedCategory} 
+              brandFilter={brandFilter || undefined} 
+            />
           </ScrollArea>
         </div>
       </main>
